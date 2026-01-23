@@ -371,9 +371,110 @@ document.addEventListener("DOMContentLoaded", () => {
     breathCircle.style.transform = "scale(1)";
   }
 
-  document.getElementById("start-timer").addEventListener("click", startBreathTimer);
-  document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
+document.getElementById("start-timer").addEventListener("click", startBreathTimer);
+document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
 
+/* --------------------- AUTO-RESTART ON DROPDOWN CHANGE --------------------- */
+presetSelect.addEventListener("change", () => {
+  if (timerInterval) {
+    stopBreathTimer();
+    startBreathTimer();
+  } else {
+    const selectedPreset = presetSelect.value;
+    instructionsEl.style.opacity = 0;
+    setTimeout(() => {
+      instructionsEl.innerText = presetPhasesText[selectedPreset][0];
+      instructionsEl.style.opacity = 1;
+    }, 100);
+  }
+});
+/* --------------------- AFFIRMATION GENERATOR --------------------- */
+const affirmations = {
+  motivation: [
+    "You are capable of amazing things.",
+    "Your potential is limitless.",
+    "Every day is a fresh start."
+  ],
+  calm: [
+    "Breathe deeply and let go.",
+    "Peace begins within.",
+    "You are relaxed and centered."
+  ],
+  confidence: [
+    "You are strong and confident.",
+    "You believe in yourself.",
+    "Your confidence inspires others."
+  ]
+};
+
+const affirmationEl = document.getElementById("affirmation");
+const categorySelect = document.getElementById("category");
+const favoritesListEl = document.getElementById("favoritesList");
+
+/* Show affirmation from selected category */
+function showAffirmation() {
+  const category = categorySelect.value;
+  const list = affirmations[category];
+  const randomIndex = Math.floor(Math.random() * list.length);
+  affirmationEl.innerText = list[randomIndex];
+}
+
+/* Show random affirmation from any category */
+function showRandomAffirmation() {
+  const categories = Object.keys(affirmations);
+  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+  const list = affirmations[randomCategory];
+  const randomIndex = Math.floor(Math.random() * list.length);
+  affirmationEl.innerText = list[randomIndex];
+}
+
+/* Save current affirmation to favorites */
+function saveFavorite() {
+  const current = affirmationEl.innerText;
+  if (!current) return;
+  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  if (!favorites.includes(current)) {
+    favorites.push(current);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    loadFavorites();
+  }
+}
+
+/* Load favorites from localStorage */
+function loadFavorites() {
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  favoritesListEl.innerHTML = "";
+  favorites.forEach(text => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    favoritesListEl.appendChild(li);
+  });
+}
+
+/* Display a daily affirmation */
+function showDailyAffirmation() {
+  const todayKey = "dailyAffirmationDate";
+  const storedDate = localStorage.getItem(todayKey);
+  const storedAffirmation = localStorage.getItem("dailyAffirmationText");
+  const today = new Date().toISOString().split("T")[0];
+
+  if (storedDate === today && storedAffirmation) {
+    affirmationEl.innerText = storedAffirmation;
+  } else {
+    showRandomAffirmation();
+    localStorage.setItem(todayKey, today);
+    localStorage.setItem("dailyAffirmationText", affirmationEl.innerText);
+  }
+}
+
+/* Attach event listeners */
+document.getElementById("get-affirmation").addEventListener("click", showAffirmation);
+document.getElementById("random-affirmation").addEventListener("click", showRandomAffirmation);
+document.getElementById("save-favorite").addEventListener("click", saveFavorite);
+
+/* Load initial state */
+loadFavorites();
+showDailyAffirmation();
 });
 </script>
 
