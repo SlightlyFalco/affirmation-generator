@@ -101,6 +101,22 @@
   }
 
   /* ---------------- BREATH TIMER ---------------- */
+
+#phase-name {
+  font-size: 2.5rem;       /* slightly bigger text */
+  font-weight: bold;
+  margin-bottom: 10px;     /* moves it up a bit from the countdown and circle */
+  transition: transform 1s linear, color 1s linear;
+}
+
+#phase-countdown {
+  font-size: 3.5rem;       /* bigger number */
+  font-weight: bold;
+  margin-top: -10px;       /* lifts it slightly so it doesn't touch the circle */
+  transition: transform 1s linear, color 1s linear;
+}
+
+
   #breath-timer-container {
     width: 420px;
     min-width: 420px;
@@ -290,90 +306,287 @@ moodSelect.addEventListener("change", () => {
 
 
   /* ---------------- BREATH TIMER ---------------- */
-  const breathPresets = {
-    "Box Breathing (4-4-4-4)":[{name:"Inhale",duration:4},{name:"Hold",duration:4},{name:"Exhale",duration:4},{name:"Hold",duration:4}],
-    "Calming (4-7-8-7)":[{name:"Inhale",duration:4},{name:"Hold",duration:7},{name:"Exhale",duration:8},{name:"Hold",duration:7}]
-  };
+
+
+  
+ const breathPresets = {
+  "Box Breathing (4-4-4-4)": [
+    {name:"Inhale",duration:4},
+    {name:"Hold",duration:4},
+    {name:"Exhale",duration:4},
+    {name:"Hold",duration:4}
+  ],
+
+  "Calming (4-7-8-7)": [
+    {name:"Inhale",duration:4},
+    {name:"Hold",duration:7},
+    {name:"Exhale",duration:8},
+    {name:"Hold",duration:7}
+  ],
+
+  "Triangle Breathing (4-4-4-0)": [
+    {name:"Inhale",duration:4},
+    {name:"Hold",duration:4},
+    {name:"Exhale",duration:4},
+    {name:"Reset",duration:0}
+  ],
+
+  "Balanced Breath (5-1-5-1)": [
+    {name:"Inhale",duration:5},
+    {name:"Pause",duration:1},
+    {name:"Exhale",duration:5},
+    {name:"Pause",duration:1}
+  ],
+
+  "Pursed Lip Reset (2-1-4-1)": [
+    {name:"Inhale",duration:2},
+    {name:"Pause",duration:1},
+    {name:"Exhale",duration:4},
+    {name:"Pause",duration:1}
+  ],
+
+  "The Calming Anchor (3-3-6-2)": [
+    {name:"Inhale",duration:3},
+    {name:"Hold",duration:3},
+    {name:"Exhale",duration:6},
+    {name:"Pause",duration:2}
+  ],
+
+  "Power Breathing (1-1-1-1)": [
+    {name:"Inhale",duration:1},
+    {name:"Hold",duration:1},
+    {name:"Exhale",duration:1},
+    {name:"Hold",duration:1}
+  ],
+
+  "Morning Wake-Up (6-2-2-1)": [
+    {name:"Inhale",duration:6},
+    {name:"Hold",duration:2},
+    {name:"Exhale",duration:2},
+    {name:"Pause",duration:1}
+  ],
+
+  "Ocean Breath — Ujjayi (4-1-4-1)": [
+    {name:"Inhale",duration:4},
+    {name:"Lock",duration:1},
+    {name:"Exhale",duration:4},
+    {name:"Lock",duration:1}
+  ],
+
+  "The Deep Dive (4-2-8-2)": [
+    {name:"Inhale",duration:4},
+    {name:"Hold",duration:2},
+    {name:"Exhale",duration:8},
+    {name:"Hold",duration:2}
+  ]
+};
+
   const presetPhasesText = {
-    "Box Breathing (4-4-4-4)":["Inhale slowly through your nose for 4 counts.","Hold your breath for 4 counts.","Exhale slowly through your mouth for 4 counts.","Hold again for 4 counts."],
-    "Calming (4-7-8-7)":["Inhale for 4 seconds.","Hold for 7 seconds.","Exhale for 8 seconds.","Hold again for 7 seconds."]
-  };
 
-  const presetSelect = document.getElementById("presetSelect");
-  Object.keys(breathPresets).forEach(name=>{
-    const option=document.createElement("option");
-    option.value=name; option.textContent=name;
-    presetSelect.appendChild(option);
-  });
+  "Box Breathing (4-4-4-4)": [
+    "Inhale slowly through your nose for 4 counts.",
+    "Hold your breath for 4 counts.",
+    "Exhale slowly through your mouth for 4 counts.",
+    "Hold again for 4 counts."
+  ],
 
-  const phaseNameEl=document.getElementById("phase-name");
-  const phaseCountdownEl=document.getElementById("phase-countdown");
-  const instructionsEl=document.getElementById("phase-instructions");
-  const beepSound=document.getElementById("beep-sound");
-  const breathCircle=document.getElementById("breath-circle");
+  "Calming (4-7-8-7)": [
+    "Inhale for 4 seconds.",
+    "Hold for 7 seconds.",
+    "Exhale for 8 seconds.",
+    "Hold again for 7 seconds."
+  ],
 
-  let phases=[...breathPresets[presetSelect.value]];
-  let currentPhase=0, remainingTime=0, timerInterval=null;
+  "Triangle Breathing (4-4-4-0)": [
+    "Inhale deeply through the nose for 4 counts.",
+    "Hold the air in your lungs for 4 counts.",
+    "Exhale every bit of air for 4 counts.",
+    "Begin the next inhale immediately with no hold."
+  ],
 
-  function updateCircle(){
-    const phase=phases[currentPhase];
-    if(phase.name==="Inhale"){
-      breathCircle.style.transition=`transform ${phase.duration}s linear`;
-      breathCircle.style.transform="scale(1.5)";
-      document.body.style.transition=`background ${phase.duration}s linear`;
-      document.body.style.setProperty('--bg-lightness','25%');
-    } else if(phase.name==="Exhale"){
-      breathCircle.style.transition=`transform ${phase.duration}s linear`;
-      breathCircle.style.transform="scale(0.7)";
-      document.body.style.transition=`background ${phase.duration}s linear`;
-      document.body.style.setProperty('--bg-lightness','8%');
+  "Balanced Breath (5-1-5-1)": [
+    "Inhale for a steady count of 5.",
+    "Pause briefly for 1 count.",
+    "Exhale for a steady count of 5.",
+    "Pause briefly for 1 count."
+  ],
+
+  "Pursed Lip Reset (2-1-4-1)": [
+    "Inhale quickly through the nose for 2 counts.",
+    "Hold the breath for 1 count.",
+    "Exhale through puckered lips for 4 counts.",
+    "Rest for 1 count."
+  ],
+
+  "The Calming Anchor (3-3-6-2)": [
+    "Inhale while expanding the belly for 3 counts.",
+    "Hold the fullness for 3 counts.",
+    "Exhale slowly to release tension for 6 counts.",
+    "Wait for 2 counts before the next breath."
+  ],
+
+  "Power Breathing (1-1-1-1)": [
+    "Inhale sharply through the nose for 1 count.",
+    "Hold the tension for 1 count.",
+    "Exhale sharply through the mouth for 1 count.",
+    "Hold the emptiness for 1 count."
+  ],
+
+  "Morning Wake-Up (6-2-2-1)": [
+    "Inhale a very long breath for 6 counts.",
+    "Hold the oxygen in for 2 counts.",
+    "Exhale in a quick burst for 2 counts.",
+    "Pause for 1 count."
+  ],
+
+  "Ocean Breath — Ujjayi (4-1-4-1)": [
+    "Inhale through the nose for 4 counts.",
+    "Lock the breath for 1 count.",
+    "Exhale through the nose with a hum for 4 counts.",
+    "Lock the breath for 1 count."
+  ],
+
+  "The Deep Dive (4-2-8-2)": [
+    "Inhale and fill the lungs for 4 counts.",
+    "Hold the breath still for 2 counts.",
+    "Exhale as slowly as possible for 8 counts.",
+    "Hold the empty state for 2 counts."
+  ]
+};
+
+
+ const presetSelect = document.getElementById("presetSelect");
+Object.keys(breathPresets).forEach(name => {
+  const option = document.createElement("option");
+  option.value = name; 
+  option.textContent = name;
+  presetSelect.appendChild(option);
+});
+
+const phaseNameEl = document.getElementById("phase-name");
+const phaseCountdownEl = document.getElementById("phase-countdown");
+const instructionsEl = document.getElementById("phase-instructions");
+const beepSound = document.getElementById("beep-sound");
+const breathCircle = document.getElementById("breath-circle");
+
+let phases = [...breathPresets[presetSelect.value]];
+let currentPhase = 0, remainingTime = 0, timerInterval = null;
+
+function updateCircle() {
+  const phase = phases[currentPhase];
+
+  // Default hold color
+  let textColor = "#6BCB77"; // green
+
+  // INHALE — expand visuals
+  if (phase.name === "Inhale") {
+    breathCircle.style.transition = `transform ${phase.duration}s linear`;
+    breathCircle.style.transform = "scale(1.5)";
+
+    phaseNameEl.style.transition = `transform ${phase.duration}s linear, color ${phase.duration}s linear`;
+    phaseCountdownEl.style.transition = `transform ${phase.duration}s linear, color ${phase.duration}s linear`;
+
+    phaseNameEl.style.transform = "translateY(-30px) scale(1.15)";
+phaseCountdownEl.style.transform = "translateY(-30px) scale(1.35)";
+phaseNameEl.style.color = "#4D96FF"; // inhale = blue
+phaseCountdownEl.style.color = "#4D96FF";
+
+    document.body.style.transition = `background ${phase.duration}s linear`;
+    document.body.style.setProperty('--bg-lightness', '25%');
+  }
+
+  // EXHALE — contract visuals
+  else if (phase.name === "Exhale") {
+    breathCircle.style.transition = `transform ${phase.duration}s linear`;
+    breathCircle.style.transform = "scale(0.7)";
+
+    phaseNameEl.style.transition = `transform ${phase.duration}s linear, color ${phase.duration}s linear`;
+    phaseCountdownEl.style.transition = `transform ${phase.duration}s linear, color ${phase.duration}s linear`;
+
+    phaseNameEl.style.transform = "translateY(-30px) scale(0.95)";
+phaseCountdownEl.style.transform = "translateY(-30px) scale(0.75)";
+phaseNameEl.style.color = "#FF6B6B"; // exhale = orange
+phaseCountdownEl.style.color = "#FF6B6B";
+
+    document.body.style.transition = `background ${phase.duration}s linear`;
+    document.body.style.setProperty('--bg-lightness', '8%');
+  }
+
+  // HOLD / PAUSE — steady
+  else {
+    breathCircle.style.transition = "none";
+    phaseNameEl.style.transition = "none";
+    phaseCountdownEl.style.transition = "none";
+
+    textColor = "#6BCB77"; // green
+
+    if (phases[currentPhase - 1]?.name === "Inhale") {
+      breathCircle.style.transform = "scale(1.5)";
+      phaseNameEl.style.transform = "scale(1.15)";
+      phaseCountdownEl.style.transform = "scale(1.35)";
+      document.body.style.setProperty('--bg-lightness', '25%');
     } else {
-      breathCircle.style.transition="none";
-      if(phases[currentPhase-1]?.name==="Inhale"){document.body.style.setProperty('--bg-lightness','25%'); breathCircle.style.transform="scale(1.5)";}
-      else if(phases[currentPhase-1]?.name==="Exhale"){document.body.style.setProperty('--bg-lightness','8%'); breathCircle.style.transform="scale(0.7)";}
+      breathCircle.style.transform = "scale(0.7)";
+      phaseNameEl.style.transform = "scale(0.95)";
+      phaseCountdownEl.style.transform = "scale(0.75)";
+      document.body.style.setProperty('--bg-lightness', '8%');
     }
   }
 
-  function startBreathTimer(){
-    if(timerInterval) return;
-    const selected=presetSelect.value;
-    phases=breathPresets[selected].map(p=>({...p}));
-    currentPhase=0; remainingTime=phases[0].duration;
-    phaseNameEl.innerText=phases[0].name;
-    phaseCountdownEl.innerText=remainingTime;
-    instructionsEl.style.opacity=0;
-    setTimeout(()=>{instructionsEl.innerText=presetPhasesText[selected][0]; instructionsEl.style.opacity=1;},100);
-    if(beepSound){ beepSound.currentTime=0; beepSound.play().catch(()=>{});}
+  // Apply colors
+  phaseNameEl.style.color = textColor;
+  phaseCountdownEl.style.color = textColor;
+}
+
+function startBreathTimer() {
+  if (timerInterval) return;
+  const selected = presetSelect.value;
+  phases = breathPresets[selected].map(p => ({ ...p }));
+  currentPhase = 0; remainingTime = phases[0].duration;
+  phaseNameEl.innerText = phases[0].name;
+  phaseCountdownEl.innerText = remainingTime;
+  instructionsEl.style.opacity = 0;
+  setTimeout(() => { instructionsEl.innerText = presetPhasesText[selected][0]; instructionsEl.style.opacity = 1; }, 100);
+  if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(() => {}); }
+  updateCircle();
+
+  timerInterval = setInterval(() => {
+    remainingTime--; 
+    phaseCountdownEl.innerText = remainingTime;
+    if (remainingTime <= 0) {
+      currentPhase = (currentPhase + 1) % phases.length;
+      remainingTime = phases[currentPhase].duration;
+      phaseNameEl.innerText = phases[currentPhase].name;
+      phaseCountdownEl.innerText = remainingTime;
+      if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(() => {}); }
+      instructionsEl.style.opacity = 0;
+      setTimeout(() => { instructionsEl.innerText = presetPhasesText[selected][currentPhase]; instructionsEl.style.opacity = 1; }, 200);
+    }
     updateCircle();
+  }, 1000);
+}
 
-    timerInterval=setInterval(()=>{
-      remainingTime--; phaseCountdownEl.innerText=remainingTime;
-      if(remainingTime<=0){
-        currentPhase=(currentPhase+1)%phases.length;
-        remainingTime=phases[currentPhase].duration;
-        phaseNameEl.innerText=phases[currentPhase].name;
-        phaseCountdownEl.innerText=remainingTime;
-        if(beepSound){ beepSound.currentTime=0; beepSound.play().catch(()=>{});}
-        instructionsEl.style.opacity=0;
-        setTimeout(()=>{ instructionsEl.innerText=presetPhasesText[selected][currentPhase]; instructionsEl.style.opacity=1;},200);
-      }
-      updateCircle();
-    },1000);
+function stopBreathTimer() {
+  clearInterval(timerInterval); timerInterval = null;
+  phaseNameEl.innerText = "Press Start"; 
+  phaseCountdownEl.innerText = 0;
+  instructionsEl.style.opacity = 0; 
+  breathCircle.style.transform = "scale(1)";
+}
+
+document.getElementById("start-timer").addEventListener("click", startBreathTimer);
+document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
+
+presetSelect.addEventListener("change", () => {
+  if (timerInterval) { 
+    stopBreathTimer(); 
+    startBreathTimer(); 
+  } else { 
+    const selected = presetSelect.value; 
+    instructionsEl.style.opacity = 0; 
+    setTimeout(() => { instructionsEl.innerText = presetPhasesText[selected][0]; instructionsEl.style.opacity = 1; }, 100);
   }
-
-  function stopBreathTimer(){
-    clearInterval(timerInterval); timerInterval=null;
-    phaseNameEl.innerText="Press Start"; phaseCountdownEl.innerText=0;
-    instructionsEl.style.opacity=0; breathCircle.style.transform="scale(1)";
-  }
-
-  document.getElementById("start-timer").addEventListener("click",startBreathTimer);
-  document.getElementById("stop-timer").addEventListener("click",stopBreathTimer);
-
-  presetSelect.addEventListener("change",()=>{
-    if(timerInterval){ stopBreathTimer(); startBreathTimer();}
-    else{ const selected=presetSelect.value; instructionsEl.style.opacity=0; setTimeout(()=>{instructionsEl.innerText=presetPhasesText[selected][0]; instructionsEl.style.opacity=1;},100);}
-  });
+});
 
 });
 </script>
