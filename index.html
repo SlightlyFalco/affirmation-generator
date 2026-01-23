@@ -148,9 +148,8 @@
       Select a preset to see instructions.
     </p>
     <!-- PHASE INSTRUCTIONS CONTAINER -->
-<div id="phase-instructions" style="font-size: 1.2rem; color:#c0c0c0; min-height: 60px; margin-top:10px; text-align:center; opacity:0; transition: opacity 0.5s;">
-  <!-- Phase-specific instruction will appear here -->
-</div>
+<div id="phase-instructions" style="font-size: 1.2rem; color:#c0c0c0; min-height: 60px; margin-top:10px; text-align:center; opacity:0; transition: opacity 0.5s;"></div>
+
 
     <p id="phase-name">Press Start</p>
     <p id="phase-countdown">0</p>
@@ -171,7 +170,7 @@
   <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* --------------------- AFFIRMATIONS --------------------- */
+  // --------------------- AFFIRMATIONS ---------------------
   const affirmations = {
     motivation: [
       "You are capable of amazing things.",
@@ -194,8 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const category = document.getElementById("category").value;
     const list = affirmations[category];
     const randomIndex = Math.floor(Math.random() * list.length);
-    const affirmation = list[randomIndex];
-    document.getElementById("affirmation").innerText = affirmation;
+    document.getElementById("affirmation").innerText = list[randomIndex];
   }
 
   function showRandomAffirmation() {
@@ -203,13 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
     const list = affirmations[randomCategory];
     const randomIndex = Math.floor(Math.random() * list.length);
-    const affirmation = list[randomIndex];
-    document.getElementById("affirmation").innerText = affirmation;
+    document.getElementById("affirmation").innerText = list[randomIndex];
   }
 
   function getTodayString() {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+    return new Date().toISOString().split('T')[0];
   }
 
   function showDailyAffirmation() {
@@ -237,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
     const listEl = document.getElementById("favoritesList");
     listEl.innerHTML = "";
-    favorites.forEach((text) => {
+    favorites.forEach(text => {
       const li = document.createElement("li");
       li.textContent = text;
       listEl.appendChild(li);
@@ -258,49 +254,36 @@ document.addEventListener("DOMContentLoaded", () => {
   showDailyAffirmation();
   loadFavorites();
 
- /* --------------------- BREATH TIMER --------------------- */
-const breathPresets = {
-  "Box (4-4-4-4)": [
-    { name: "Inhale", duration: 4 },
-    { name: "Hold", duration: 4 },
-    { name: "Exhale", duration: 4 },
-    { name: "Hold", duration: 4 },
-  ],
-  "Calming (4-7-8-7)": [
-    { name: "Inhale", duration: 4 },
-    { name: "Hold", duration: 7 },
-    { name: "Exhale", duration: 8 },
-    { name: "Hold", duration: 7 },
-  ]
-}; 
+  // --------------------- BREATH TIMER ---------------------
+  const breathPresets = {
+    "Box (4-4-4-4)": [
+      { name: "Inhale", duration: 4 },
+      { name: "Hold", duration: 4 },
+      { name: "Exhale", duration: 4 },
+      { name: "Hold", duration: 4 },
+    ],
+    "Calming (4-7-8-7)": [
+      { name: "Inhale", duration: 4 },
+      { name: "Hold", duration: 7 },
+      { name: "Exhale", duration: 8 },
+      { name: "Hold", duration: 7 },
+    ]
+  };
 
-// PHASE-SPECIFIC INSTRUCTIONS
-const presetPhasesText = {
-  "Box (4-4-4-4)": [
-    "Inhale slowly through your nose for 4 counts.",
-    "Hold your breath for 4 counts.",
-    "Exhale slowly through your mouth for 4 counts.",
-    "Hold your breath again for 4 counts."
-  ],
-  "Calming (4-7-8-7)": [
-    "Inhale quietly through your nose for 4 seconds.",
-    "Hold your breath for 7 seconds.",
-    "Exhale forcefully through your mouth for 8 seconds.",
-    "Hold your breath again for 7 seconds."
-  ]
-};
-
-  let phases = [...breathPresets["Box (4-4-4-4)"]];
-  let currentPhase = 0;
-  let remainingTime = 0;
-  let timerInterval = null;
-
-  const phaseNameEl = document.getElementById("phase-name");
-  const phaseCountdownEl = document.getElementById("phase-countdown");
-  const beepSound = document.getElementById("beep-sound");
-  const breathCircle = document.getElementById("breath-circle");
-  const presetSelect = document.getElementById("presetSelect");
-  const presetInfoEl = document.getElementById("preset-info");
+  const presetPhasesText = {
+    "Box (4-4-4-4)": [
+      "Inhale slowly through your nose for 4 counts.",
+      "Hold your breath for 4 counts.",
+      "Exhale slowly through your mouth for 4 counts.",
+      "Hold your breath again for 4 counts."
+    ],
+    "Calming (4-7-8-7)": [
+      "Inhale quietly through your nose for 4 seconds.",
+      "Hold your breath for 7 seconds.",
+      "Exhale forcefully through your mouth for 8 seconds.",
+      "Hold your breath again for 7 seconds."
+    ]
+  };
 
   const presetInfo = {
     "Box (4-4-4-4)": `Box Breathing (Square Breathing):
@@ -316,10 +299,21 @@ Exhale forcefully through your mouth for 8 seconds.
 Repeat the cycle up to 4 times.`
   };
 
-  function updateCircle() {
-    if (!breathCircle) return;
-    const phase = phases[currentPhase];
+  let phases = [...breathPresets["Box (4-4-4-4)"]];
+  let currentPhase = 0;
+  let remainingTime = 0;
+  let timerInterval = null;
 
+  const phaseNameEl = document.getElementById("phase-name");
+  const phaseCountdownEl = document.getElementById("phase-countdown");
+  const instructionsEl = document.getElementById("phase-instructions");
+  const beepSound = document.getElementById("beep-sound");
+  const breathCircle = document.getElementById("breath-circle");
+  const presetSelect = document.getElementById("presetSelect");
+  const presetInfoEl = document.getElementById("preset-info");
+
+  function updateCircle() {
+    const phase = phases[currentPhase];
     if (phase.name === "Inhale") {
       breathCircle.style.transition = `transform ${phase.duration}s linear`;
       breathCircle.style.transform = "scale(1.5)";
@@ -341,14 +335,23 @@ Repeat the cycle up to 4 times.`
 
     const selectedPreset = presetSelect.value;
     presetInfoEl.innerText = presetInfo[selectedPreset] || "";
-
     phases = breathPresets[selectedPreset].map(p => ({ ...p }));
 
     currentPhase = 0;
     remainingTime = phases[currentPhase].duration;
     phaseNameEl.innerText = phases[currentPhase].name;
     phaseCountdownEl.innerText = remainingTime;
-    beepSound.play();
+
+    // Show first instruction
+    instructionsEl.innerText = presetPhasesText[selectedPreset][currentPhase];
+    instructionsEl.style.opacity = 1;
+
+    // Play beep at start
+    if (beepSound) {
+      beepSound.currentTime = 0;
+      beepSound.play().catch(() => {});
+    }
+
     updateCircle();
 
     timerInterval = setInterval(() => {
@@ -360,8 +363,23 @@ Repeat the cycle up to 4 times.`
         remainingTime = phases[currentPhase].duration;
         phaseNameEl.innerText = phases[currentPhase].name;
         phaseCountdownEl.innerText = remainingTime;
-        beepSound.play();
+
+        if (beepSound) {
+          beepSound.currentTime = 0;
+          beepSound.play().catch(() => {});
+        }
+
+        // Update instructions with fade
+        const selectedPreset = presetSelect.value;
+        const phaseTextLines = presetPhasesText[selectedPreset] || [""];
+        instructionsEl.style.opacity = 0;
+        setTimeout(() => {
+          instructionsEl.innerText = phaseTextLines[currentPhase];
+          instructionsEl.style.opacity = 1;
+        }, 200);
+
       }
+
       updateCircle();
     }, 1000);
   }
@@ -371,13 +389,15 @@ Repeat the cycle up to 4 times.`
     timerInterval = null;
     phaseNameEl.innerText = "Press Start";
     phaseCountdownEl.innerText = 0;
+    instructionsEl.style.opacity = 0;
     breathCircle.style.transform = "scale(1)";
   }
 
   document.getElementById("start-timer").addEventListener("click", startBreathTimer);
   document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
 
-});
-  </script>
+}); // CLEANED SCRIPT END
+</script>
+
 </body>
 </html>
