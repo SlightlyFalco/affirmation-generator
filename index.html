@@ -147,6 +147,10 @@
     <p id="preset-info" style="margin-top: 8px; font-size: 0.9rem; color: #c0c0c0; min-height: 80px; text-align: left;">
       Select a preset to see instructions.
     </p>
+    <!-- PHASE INSTRUCTIONS CONTAINER -->
+<div id="phase-instructions" style="font-size: 1.2rem; color:#c0c0c0; min-height: 60px; margin-top:10px; text-align:center; opacity:0; transition: opacity 0.5s;">
+  <!-- Phase-specific instruction will appear here -->
+</div>
 
     <p id="phase-name">Press Start</p>
     <p id="phase-countdown">0</p>
@@ -254,21 +258,37 @@ document.addEventListener("DOMContentLoaded", () => {
   showDailyAffirmation();
   loadFavorites();
 
-  /* --------------------- BREATH TIMER --------------------- */
-  const breathPresets = {
-    "Box (4-4-4-4)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 4 },
-      { name: "Exhale", duration: 4 },
-      { name: "Hold", duration: 4 },
-    ],
-    "Calming (4-7-8-7)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 7 },
-      { name: "Exhale", duration: 8 },
-      { name: "Hold", duration: 7 },
-    ]
-  };
+ /* --------------------- BREATH TIMER --------------------- */
+const breathPresets = {
+  "Box (4-4-4-4)": [
+    { name: "Inhale", duration: 4 },
+    { name: "Hold", duration: 4 },
+    { name: "Exhale", duration: 4 },
+    { name: "Hold", duration: 4 },
+  ],
+  "Calming (4-7-8-7)": [
+    { name: "Inhale", duration: 4 },
+    { name: "Hold", duration: 7 },
+    { name: "Exhale", duration: 8 },
+    { name: "Hold", duration: 7 },
+  ]
+}; 
+
+// PHASE-SPECIFIC INSTRUCTIONS
+const presetPhasesText = {
+  "Box (4-4-4-4)": [
+    "Inhale slowly through your nose for 4 counts.",
+    "Hold your breath for 4 counts.",
+    "Exhale slowly through your mouth for 4 counts.",
+    "Hold your breath again for 4 counts."
+  ],
+  "Calming (4-7-8-7)": [
+    "Inhale quietly through your nose for 4 seconds.",
+    "Hold your breath for 7 seconds.",
+    "Exhale forcefully through your mouth for 8 seconds.",
+    "Hold your breath again for 7 seconds."
+  ]
+};
 
   let phases = [...breathPresets["Box (4-4-4-4)"]];
   let currentPhase = 0;
