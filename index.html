@@ -1,278 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Affirmation Generator & Breath Timer</title>
-  <style>
-    /* BODY & CONTAINER */
-   body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #1a1a1a, #1f4040);
-  min-height: 100vh;
-  height: 100vh;          /* fill viewport exactly */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 0;
-  color: #e0e0e0;
-  padding: 0;             /* remove extra padding causing scroll */
-  overflow: hidden;       /* prevent any scroll */
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affirmation Generator & Breath Timer</title>
+<style>
+  /* ---------------- BODY & CONTAINER ---------------- */
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #1a1a1a, #1f4040);
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0;
+    color: #e0e0e0;
+    padding: 0;
+    overflow: hidden; /* no scroll */
+  }
 
-.container:first-of-type {
-  margin-top: 3vh; /* 3% of viewport height */
-}
+  .container:first-of-type {
+    margin-top: 3vh;
+  }
 
-    .container {
-      background: #2c2c2c;
-      padding: 30px 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      text-align: center;
-      max-width: 420px;
-      width: 100%;
-      margin-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-sizing: border-box;
-    }
+  .container {
+    background: #2c2c2c;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
 
-    h1, h2, h3 {
-      margin-bottom: 16px;
-      color: #f0f0f0;
-    }
+  h1,h2,h3 { margin-bottom: 16px; color: #f0f0f0; }
+  p { margin: 12px 0; }
 
-    p {
-      color: #f5f5f5;
-      margin: 12px 0;
-    }
+  select, button {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+  }
 
-    select, button {
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-      outline: none;
-    }
+  select {
+    background: #3a3a3a;
+    color: #e0e0e0;
+    margin-bottom: 12px;
+  }
 
-    select {
-      background: #3a3a3a;
-      color: #e0e0e0;
-      margin-bottom: 12px;
-    }
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
 
-    .button-row {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
+  button {
+    background: #6a5acd;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
 
-    button {
-      background: #6a5acd;
-      color: #ffffff;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
+  button:hover {
+    background: #7b66e0;
+    transform: translateY(-2px);
+  }
 
-    button:hover {
-      background: #7b66e0;
-      transform: translateY(-2px);
-    }
+  #favoritesList { list-style: none; padding-left: 0; margin-top: 8px; width: 100%; }
+  #favoritesList li { background: #3a3a3a; padding: 6px 10px; border-radius: 8px; margin: 4px 0; text-align: left; }
 
-    /* Favorites list */
-    #favoritesList {
-      list-style: none;
-      padding-left: 0;
-      margin-top: 8px;
-      width: 100%;
-    }
+  /* ---------------- AFFIRMATION TEXT ---------------- */
+  #affirmation {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    transition: color 0.3s, transform 0.3s;
+    min-height: 60px;
+  }
 
-    #favoritesList li {
-      background: #3a3a3a;
-      padding: 6px 10px;
-      border-radius: 8px;
-      margin: 4px 0;
-      text-align: left;
-    }
+  /* ---------------- BREATH TIMER ---------------- */
+  #breath-timer-container {
+    width: 420px;
+    min-width: 420px;
+    box-sizing: border-box;
+  }
 
-    /* Breath circle */
-    #breath-circle {
-      background-color: transparent;
-      border: 8px solid #6a5acd;
-      border-radius: 50%;
-      transition: transform 1s linear;
-      margin: 20px 0 60px 0;
-      width: 120px;
-      height: 120px;
-      box-sizing: border-box;
-    }
+  #phase-instructions {
+    font-size: 1.2rem;
+    color: #c0c0c0;
+    min-height: 60px;
+    margin-top: 10px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-    /* Breath timer container fixed size */
-    #breath-timer-container {
-      width: 420px;
-      min-width: 420px;
-      box-sizing: border-box;
-    }
+  #breath-circle {
+    background-color: transparent;
+    border: 8px solid #6a5acd;
+    border-radius: 50%;
+    transition: transform 1s linear;
+    margin: 20px 0 60px 0;
+    width: 120px;
+    height: 120px;
+    box-sizing: border-box;
+  }
 
-    /* Phase-specific instructions */
-    #phase-instructions {
-      font-size: 1.2rem;
-      color: #c0c0c0;
-      min-height: 60px;
-      margin-top: 10px;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.5s;
-      width: 100%;
-      box-sizing: border-box;
-    }
-  </style>
+  /* ---------------- CONFETTI ---------------- */
+  .confetti {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: red;
+    pointer-events: none;
+    animation: confetti-fall 1s forwards;
+  }
+
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(150px) rotate(360deg); opacity: 0; }
+  }
+
+</style>
 </head>
 <body>
 
-  <!-- AFFIRMATION GENERATOR -->
-  <div class="container">
-    <h1>Affirmation Generator</h1>
-    <p id="affirmation"></p>
-    <select id="category">
-      <option value="motivation">Motivation</option>
-      <option value="calm">Calm</option>
-      <option value="confidence">Confidence</option>
-    </select>
-    <div class="button-row">
-      <button id="get-affirmation">Get Affirmation</button>
-      <button id="random-affirmation">Surprise Me!</button>
-      <button id="save-favorite">Save to Favorites ❤️</button>
-    </div>
-    <div style="text-align: center; margin-top: 16px; width: 100%;">
-      <h3>Your Favorites:</h3>
-      <ul id="favoritesList"></ul>
-    </div>
+<!-- AFFIRMATION GENERATOR -->
+<div class="container">
+  <h1>Affirmation Generator</h1>
+  <p id="affirmation"></p>
+  <select id="category">
+    <option value="motivation">Motivation</option>
+    <option value="calm">Calm</option>
+    <option value="confidence">Confidence</option>
+  </select>
+  <div class="button-row">
+    <button id="get-affirmation">Get Affirmation</button>
+    <button id="random-affirmation">Surprise Me!</button>
+    <button id="save-favorite">Save to Favorites ❤️</button>
   </div>
+  <div style="text-align: center; margin-top: 16px; width: 100%;">
+    <h3>Your Favorites:</h3>
+    <ul id="favoritesList"></ul>
+  </div>
+</div>
 
-  <!-- BREATH TIMER -->
+<!-- BREATH TIMER -->
 <div class="container" id="breath-timer-container">
   <h2>Breath Timer</h2>
-
-  <!-- Preset Selector -->
   <label for="presetSelect" style="margin-bottom: 8px;">Choose Preset:</label>
   <select id="presetSelect"></select>
-
-  <!-- Phase-specific instructions -->
   <div id="phase-instructions"></div>
-
   <p id="phase-name">Press Start</p>
   <p id="phase-countdown">0</p>
-
   <div id="breath-circle"></div>
-
   <div class="button-row">
     <button id="start-timer">Start</button>
     <button id="stop-timer">Stop</button>
   </div>
-
   <audio id="beep-sound">
     <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
   </audio>
 </div>
 
-<!-- CSS for Breath Timer -->
-<style>
-#breath-timer-container {
-  width: 420px;
-  min-width: 420px; /* prevent shrinking when instructions change */
-  box-sizing: border-box;
-}
-
-#phase-instructions {
-  font-size: 1.2rem;
-  color: #c0c0c0;
-  min-height: 60px;
-  margin-top: 10px;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.5s;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#breath-circle {
-  background-color: transparent;
-  border: 8px solid #6a5acd;
-  border-radius: 50%;
-  transition: transform 1s linear;
-  margin: 20px 0 60px 0;
-  width: 120px;
-  height: 120px;
-  box-sizing: border-box;
-}
-</style>
-
-<!-- JS for Breath Timer -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  /* ---------------- AFFIRMATIONS ---------------- */
+  const affirmationEl = document.getElementById("affirmation");
+  const categoryEl = document.getElementById("category");
+  const favoritesList = document.getElementById("favoritesList");
 
-  /* --------------------- BREATH TIMER PRESETS --------------------- */
-  const breathPresets = {
-    "Box Breathing (4-4-4-4)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 4 },
-      { name: "Exhale", duration: 4 },
-      { name: "Hold", duration: 4 }
+  const affirmations = {
+    motivation: [
+      "You are capable of amazing things.",
+      "Your potential is limitless.",
+      "Every day is a fresh start."
     ],
-    "Calming 4-7-8 (4-7-8-7)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 7 },
-      { name: "Exhale", duration: 8 },
-      { name: "Hold", duration: 7 }
+    calm: [
+      "Breathe deeply and let go.",
+      "Peace begins within.",
+      "You are relaxed and centered."
     ],
-    "Paced Breathing (2-4-6-4)": [
-      { name: "Inhale", duration: 2 },
-      { name: "Hold", duration: 4 },
-      { name: "Exhale", duration: 6 },
-      { name: "Hold", duration: 4 }
-    ],
-    "Energizing Breath (3-3-3-3)": [
-      { name: "Inhale", duration: 3 },
-      { name: "Hold", duration: 3 },
-      { name: "Exhale", duration: 3 },
-      { name: "Hold", duration: 3 }
+    confidence: [
+      "You are strong and confident.",
+      "You believe in yourself.",
+      "Your confidence inspires others."
     ]
   };
 
-  const presetPhasesText = {
+  const colors = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#FF6AD5"];
+  function randomColor() { return colors[Math.floor(Math.random()*colors.length)]; }
+
+  function showAffirmation(list) {
+    const index = Math.floor(Math.random() * list.length);
+    affirmationEl.innerText = list[index];
+    affirmationEl.style.color = randomColor();
+    affirmationEl.style.transform = "scale(1.2)";
+    setTimeout(() => affirmationEl.style.transform = "scale(1)", 300);
+
+    // Confetti burst
+    for (let i = 0; i < 10; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.style.left = `${affirmationEl.offsetLeft + Math.random() * affirmationEl.offsetWidth}px`;
+      confetti.style.top = `${affirmationEl.offsetTop}px`;
+      confetti.style.background = randomColor();
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 1000);
+    }
+  }
+
+  document.getElementById("get-affirmation").addEventListener("click", () => {
+    showAffirmation(affirmations[categoryEl.value]);
+  });
+
+  document.getElementById("random-affirmation").addEventListener("click", () => {
+    const keys = Object.keys(affirmations);
+    const randomCat = keys[Math.floor(Math.random() * keys.length)];
+    showAffirmation(affirmations[randomCat]);
+  });
+
+  document.getElementById("save-favorite").addEventListener("click", () => {
+    const text = affirmationEl.innerText;
+    if (!text) return;
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    if (!favorites.includes(text)) favorites.push(text);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    loadFavorites();
+  });
+
+  function loadFavorites() {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    favoritesList.innerHTML = "";
+    favorites.forEach(f => {
+      const li = document.createElement("li");
+      li.textContent = f;
+      favoritesList.appendChild(li);
+    });
+  }
+
+  loadFavorites();
+
+  /* ---------------- BREATH TIMER ---------------- */
+  const breathPresets = {
     "Box Breathing (4-4-4-4)": [
+      {name:"Inhale", duration:4},{name:"Hold", duration:4},{name:"Exhale", duration:4},{name:"Hold", duration:4}
+    ],
+    "Calming 4-7-8 (4-7-8-7)": [
+      {name:"Inhale", duration:4},{name:"Hold", duration:7},{name:"Exhale", duration:8},{name:"Hold", duration:7}
+    ]
+  };
+  const presetPhasesText = {
+    "Box Breathing (4-4-4-4)":[
       "Inhale slowly through your nose for 4 counts.",
       "Hold your breath for 4 counts.",
       "Exhale slowly through your mouth for 4 counts.",
-      "Hold your breath again for 4 counts."
+      "Hold again for 4 counts."
     ],
-    "Calming 4-7-8 (4-7-8-7)": [
-      "Inhale quietly through your nose for 4 seconds.",
-      "Hold your breath for 7 seconds.",
-      "Exhale forcefully through your mouth for 8 seconds.",
-      "Hold your breath again for 7 seconds."
-    ],
-    "Paced Breathing (2-4-6-4)": [
-      "Inhale through your nose for 2 seconds.",
-      "Hold for 4 seconds.",
-      "Exhale slowly through pursed lips for 6 seconds.",
-      "Hold for 4 seconds."
-    ],
-    "Energizing Breath (3-3-3-3)": [
-      "Inhale deeply for 3 seconds.",
-      "Hold for 3 seconds while raising arms overhead.",
-      "Exhale fully for 3 seconds while lowering arms.",
-      "Hold for 3 seconds before repeating."
+    "Calming 4-7-8 (4-7-8-7)":[
+      "Inhale for 4 seconds.",
+      "Hold for 7 seconds.",
+      "Exhale for 8 seconds.",
+      "Hold again for 7 seconds."
     ]
   };
 
-  /* --------------------- POPULATE DROPDOWN --------------------- */
   const presetSelect = document.getElementById("presetSelect");
   Object.keys(breathPresets).forEach(name => {
     const option = document.createElement("option");
@@ -281,202 +287,68 @@ document.addEventListener("DOMContentLoaded", () => {
     presetSelect.appendChild(option);
   });
 
-  /* --------------------- TIMER VARIABLES --------------------- */
-  let phases = [...breathPresets[presetSelect.value]];
-  let currentPhase = 0;
-  let remainingTime = 0;
-  let timerInterval = null;
-
   const phaseNameEl = document.getElementById("phase-name");
   const phaseCountdownEl = document.getElementById("phase-countdown");
   const instructionsEl = document.getElementById("phase-instructions");
   const beepSound = document.getElementById("beep-sound");
   const breathCircle = document.getElementById("breath-circle");
 
-  /* --------------------- CIRCLE ANIMATION --------------------- */
-  function updateCircle() {
+  let phases = [...breathPresets[presetSelect.value]];
+  let currentPhase=0, remainingTime=0, timerInterval=null;
+
+  function updateCircle(){
     const phase = phases[currentPhase];
-    if (phase.name === "Inhale") {
-      breathCircle.style.transition = `transform ${phase.duration}s linear`;
-      breathCircle.style.transform = "scale(1.5)";
-    } else if (phase.name === "Exhale") {
-      breathCircle.style.transition = `transform ${phase.duration}s linear`;
-      breathCircle.style.transform = "scale(0.7)";
-    } else {
-      breathCircle.style.transition = "none";
-      if (phases[currentPhase - 1]?.name === "Inhale") {
-        breathCircle.style.transform = "scale(1.5)";
-      } else if (phases[currentPhase - 1]?.name === "Exhale") {
-        breathCircle.style.transform = "scale(0.7)";
-      }
-    }
+    if(phase.name==="Inhale"){ breathCircle.style.transition=`transform ${phase.duration}s linear`; breathCircle.style.transform="scale(1.5)"; }
+    else if(phase.name==="Exhale"){ breathCircle.style.transition=`transform ${phase.duration}s linear`; breathCircle.style.transform="scale(0.7)"; }
+    else{ breathCircle.style.transition="none"; }
   }
 
-  /* --------------------- START TIMER --------------------- */
-  function startBreathTimer() {
-    if (timerInterval) return;
-
-    const selectedPreset = presetSelect.value;
-    phases = breathPresets[selectedPreset].map(p => ({ ...p }));
-    currentPhase = 0;
-    remainingTime = phases[0].duration;
-    phaseNameEl.innerText = phases[0].name;
-    phaseCountdownEl.innerText = remainingTime;
-
-    // show initial instruction
-    instructionsEl.style.opacity = 0;
-    setTimeout(() => {
-      instructionsEl.innerText = presetPhasesText[selectedPreset][0];
-      instructionsEl.style.opacity = 1;
-    }, 100);
-
-    // play initial beep
-    if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(()=>{}); }
-
+  function startBreathTimer(){
+    if(timerInterval) return;
+    const selected = presetSelect.value;
+    phases = breathPresets[selected].map(p=>({...p}));
+    currentPhase=0; remainingTime=phases[0].duration;
+    phaseNameEl.innerText=phases[0].name;
+    phaseCountdownEl.innerText=remainingTime;
+    instructionsEl.style.opacity=0;
+    setTimeout(()=>{ instructionsEl.innerText=presetPhasesText[selected][0]; instructionsEl.style.opacity=1; },100);
+    if(beepSound){ beepSound.currentTime=0; beepSound.play().catch(()=>{});}
     updateCircle();
 
-    timerInterval = setInterval(() => {
-      remainingTime--;
-      phaseCountdownEl.innerText = remainingTime;
-
-      if (remainingTime <= 0) {
-        // next phase
-        currentPhase = (currentPhase + 1) % phases.length;
-        remainingTime = phases[currentPhase].duration;
-        phaseNameEl.innerText = phases[currentPhase].name;
-        phaseCountdownEl.innerText = remainingTime;
-
-        // play beep safely
-        if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(()=>{}); }
-
-        // update phase instruction
-        instructionsEl.style.opacity = 0;
-        setTimeout(() => {
-          instructionsEl.innerText = presetPhasesText[selectedPreset][currentPhase];
-          instructionsEl.style.opacity = 1;
-        }, 200);
+    timerInterval = setInterval(()=>{
+      remainingTime--; phaseCountdownEl.innerText=remainingTime;
+      if(remainingTime<=0){
+        currentPhase=(currentPhase+1)%phases.length;
+        remainingTime=phases[currentPhase].duration;
+        phaseNameEl.innerText=phases[currentPhase].name;
+        phaseCountdownEl.innerText=remainingTime;
+        if(beepSound){ beepSound.currentTime=0; beepSound.play().catch(()=>{});}
+        instructionsEl.style.opacity=0;
+        setTimeout(()=>{ instructionsEl.innerText=presetPhasesText[selected][currentPhase]; instructionsEl.style.opacity=1; },200);
       }
-
       updateCircle();
-    }, 1000);
+    },1000);
   }
 
-  /* --------------------- STOP TIMER --------------------- */
-  function stopBreathTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    phaseNameEl.innerText = "Press Start";
-    phaseCountdownEl.innerText = 0;
-    instructionsEl.style.opacity = 0;
-    breathCircle.style.transform = "scale(1)";
+  function stopBreathTimer(){
+    clearInterval(timerInterval); timerInterval=null;
+    phaseNameEl.innerText="Press Start"; phaseCountdownEl.innerText=0;
+    instructionsEl.style.opacity=0; breathCircle.style.transform="scale(1)";
   }
 
-document.getElementById("start-timer").addEventListener("click", startBreathTimer);
-document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
+  document.getElementById("start-timer").addEventListener("click", startBreathTimer);
+  document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
 
-/* --------------------- AUTO-RESTART ON DROPDOWN CHANGE --------------------- */
-presetSelect.addEventListener("change", () => {
-  if (timerInterval) {
-    stopBreathTimer();
-    startBreathTimer();
-  } else {
-    const selectedPreset = presetSelect.value;
-    instructionsEl.style.opacity = 0;
-    setTimeout(() => {
-      instructionsEl.innerText = presetPhasesText[selectedPreset][0];
-      instructionsEl.style.opacity = 1;
-    }, 100);
-  }
-});
-/* --------------------- AFFIRMATION GENERATOR --------------------- */
-const affirmations = {
-  motivation: [
-    "You are capable of amazing things.",
-    "Your potential is limitless.",
-    "Every day is a fresh start."
-  ],
-  calm: [
-    "Breathe deeply and let go.",
-    "Peace begins within.",
-    "You are relaxed and centered."
-  ],
-  confidence: [
-    "You are strong and confident.",
-    "You believe in yourself.",
-    "Your confidence inspires others."
-  ]
-};
-
-const affirmationEl = document.getElementById("affirmation");
-const categorySelect = document.getElementById("category");
-const favoritesListEl = document.getElementById("favoritesList");
-
-/* Show affirmation from selected category */
-function showAffirmation() {
-  const category = categorySelect.value;
-  const list = affirmations[category];
-  const randomIndex = Math.floor(Math.random() * list.length);
-  affirmationEl.innerText = list[randomIndex];
-}
-
-/* Show random affirmation from any category */
-function showRandomAffirmation() {
-  const categories = Object.keys(affirmations);
-  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-  const list = affirmations[randomCategory];
-  const randomIndex = Math.floor(Math.random() * list.length);
-  affirmationEl.innerText = list[randomIndex];
-}
-
-/* Save current affirmation to favorites */
-function saveFavorite() {
-  const current = affirmationEl.innerText;
-  if (!current) return;
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  if (!favorites.includes(current)) {
-    favorites.push(current);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-    loadFavorites();
-  }
-}
-
-/* Load favorites from localStorage */
-function loadFavorites() {
-  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  favoritesListEl.innerHTML = "";
-  favorites.forEach(text => {
-    const li = document.createElement("li");
-    li.textContent = text;
-    favoritesListEl.appendChild(li);
+  presetSelect.addEventListener("change", ()=>{
+    if(timerInterval){ stopBreathTimer(); startBreathTimer(); }
+    else{
+      const selected = presetSelect.value;
+      instructionsEl.style.opacity=0;
+      setTimeout(()=>{ instructionsEl.innerText=presetPhasesText[selected][0]; instructionsEl.style.opacity=1; },100);
+    }
   });
-}
 
-/* Display a daily affirmation */
-function showDailyAffirmation() {
-  const todayKey = "dailyAffirmationDate";
-  const storedDate = localStorage.getItem(todayKey);
-  const storedAffirmation = localStorage.getItem("dailyAffirmationText");
-  const today = new Date().toISOString().split("T")[0];
-
-  if (storedDate === today && storedAffirmation) {
-    affirmationEl.innerText = storedAffirmation;
-  } else {
-    showRandomAffirmation();
-    localStorage.setItem(todayKey, today);
-    localStorage.setItem("dailyAffirmationText", affirmationEl.innerText);
-  }
-}
-
-/* Attach event listeners */
-document.getElementById("get-affirmation").addEventListener("click", showAffirmation);
-document.getElementById("random-affirmation").addEventListener("click", showRandomAffirmation);
-document.getElementById("save-favorite").addEventListener("click", saveFavorite);
-
-/* Load initial state */
-loadFavorites();
-showDailyAffirmation();
 });
 </script>
-
 </body>
 </html>
