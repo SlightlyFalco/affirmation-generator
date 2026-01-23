@@ -1,210 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Affirmation Generator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affirmation Generator & Breath Timer</title>
   <style>
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    /* Dark diagonal gradient from charcoal to muted turquoise */
-    background: linear-gradient(135deg, #1a1a1a, #1f4040);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    color: #e0e0e0; /* default text color */
-  }
-
-  .container {
-    background: #2c2c2c; /* slightly lighter dark gray */
-    padding: 30px 40px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* soft dark shadow */
-    text-align: center;
-    max-width: 420px;
-  }
-
-  h1 {
-    margin-bottom: 16px;
-    color: #f0f0f0; /* light header text */
-  }
-
-  #affirmation {
-    font-size: 1.1rem;
-    margin: 20px 0;
-    min-height: 48px;
-    color: #f5f5f5; /* high contrast but soft */
-  }
-
-  select, button {
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    outline: none;
-  }
-
-  select {
-    margin-right: 8px;
-    background: #3a3a3a; /* muted dark background */
-    color: #e0e0e0;
-  }
-
-  button {
-    background: #6a5acd; /* muted, soft purple */
-    color: #ffffff;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-
-  button:hover {
-    background: #7b66e0; /* slightly lighter purple */
-    transform: translateY(-2px);
-  }
-  
-</style>
-<script>
-  // Load favorites from localStorage and display them
-  function loadFavorites() {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    const listEl = document.getElementById("favoritesList");
-    listEl.innerHTML = ""; // Clear previous list
-
-    favorites.forEach((text, index) => {
-      const li = document.createElement("li");
-      li.textContent = text;
-      listEl.appendChild(li);
-    });
-  }
-
-  // Save the currently displayed affirmation as a favorite
-  function saveFavorite() {
-    const current = document.getElementById("affirmation").innerText;
-    if (!current) return; // Nothing to save
-
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    // Avoid duplicates
-    if (!favorites.includes(current)) {
-      favorites.push(current);
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-      loadFavorites();
+    /* BODY & CONTAINER */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1a1a1a, #1f4040);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 0;
+      color: #e0e0e0;
+      padding: 20px;
+      flex-direction: column;
+      align-items: center;
     }
-  }
 
-  // Load favorites on page load
-  window.onload = function() {
-    showDailyAffirmation(); // existing daily feature
-    loadFavorites();         // new favorites feature
-  };
-</script>
+    .container {
+      background: #2c2c2c;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+      max-width: 420px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
+    h1, h2 {
+      margin-bottom: 16px;
+      color: #f0f0f0;
+    }
 
+    p#affirmation, p#phase-name, p#phase-countdown {
+      font-size: 1.1rem;
+      margin: 12px 0;
+      min-height: 24px;
+      color: #f5f5f5;
+    }
+
+    select, button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    select {
+      margin-bottom: 12px;
+      background: #3a3a3a;
+      color: #e0e0e0;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      background: #6a5acd;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #7b66e0;
+      transform: translateY(-2px);
+    }
+
+    /* Favorites */
+    #favoritesList {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 8px;
+    }
+
+    #favoritesList li {
+      background: #3a3a3a;
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin: 4px 0;
+    }
+
+    /* Breath circle */
+    #breath-circle {
+      width: 100px;
+      height: 100px;
+      background-color: #6a5acd;
+      border-radius: 50%;
+      margin: 20px auto;
+      transition: transform 1s ease;
+    }
+  </style>
 </head>
 <body>
-<div class="container" style="display: flex; flex-direction: column; align-items: center;">
-  <h1>Affirmation Generator</h1>
 
-  <!-- Daily Affirmation / main text -->
-  <p id="affirmation"></p>
+  <!-- AFFIRMATION GENERATOR -->
+  <div class="container">
+    <h1>Affirmation Generator</h1>
 
-  <!-- Category dropdown -->
-  <select id="category">
-    <option value="motivation">Motivation</option>
-    <option value="calm">Calm</option>
-    <option value="confidence">Confidence</option>
-  </select>
+    <p id="affirmation"></p>
 
-  <!-- Buttons: Get, Surprise Me, Save Favorite -->
-  <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
-    <button onclick="showAffirmation()">Get Affirmation</button>
-    <button onclick="showRandomAffirmation()">Surprise Me!</button>
-    <button onclick="saveFavorite()">Save to Favorites ❤️</button>
+    <select id="category">
+      <option value="motivation">Motivation</option>
+      <option value="calm">Calm</option>
+      <option value="confidence">Confidence</option>
+    </select>
+
+    <div class="button-row">
+      <button onclick="showAffirmation()">Get Affirmation</button>
+      <button onclick="showRandomAffirmation()">Surprise Me!</button>
+      <button onclick="saveFavorite()">Save to Favorites ❤️</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 16px; width: 100%;">
+      <h3>Your Favorites:</h3>
+      <ul id="favoritesList"></ul>
+    </div>
   </div>
 
-  <!-- Favorites list -->
-  <div style="text-align: center; margin-top: 16px; width: 100%;">
-    <h3>Your Favorites:</h3>
-    <ul id="favoritesList" style="list-style: none; padding-left: 0;"></ul>
-  </div>
-</div>
+  <!-- BREATH TIMER -->
+  <div class="container" id="breath-timer-container">
+    <h2>Breath Timer</h2>
 
+    <p id="phase-name">Press Start</p>
+    <p id="phase-countdown">0</p>
 
+    <div id="breath-circle"></div>
 
-</div>
+    <div class="button-row">
+      <button id="start-timer">Start</button>
+      <button id="stop-timer">Stop</button>
+    </div>
 
-
-    <script>
-  // Helper: get a string of today’s date
-  function getTodayString() {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // YYYY-MM-DD
-  }
-
-  // Daily affirmation function
-  function showDailyAffirmation() {
-    const todayKey = "dailyAffirmationDate";
-    const storedDate = localStorage.getItem(todayKey);
-    const storedAffirmation = localStorage.getItem("dailyAffirmationText");
-
-    const today = getTodayString();
-
-    if (storedDate === today && storedAffirmation) {
-      // Use the stored affirmation
-      document.getElementById("affirmation").innerText = storedAffirmation;
-    } else {
-      // Pick a random category
-      const categories = Object.keys(affirmations);
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      const list = affirmations[randomCategory];
-      const randomIndex = Math.floor(Math.random() * list.length);
-      const randomAffirmation = list[randomIndex];
-
-      // Display it
-      document.getElementById("affirmation").innerText = randomAffirmation;
-
-      // Save it in localStorage
-      localStorage.setItem(todayKey, today);
-      localStorage.setItem("dailyAffirmationText", randomAffirmation);
-    }
-  }
-
-  // Run it when the page loads
-  window.onload = function() {
-    showDailyAffirmation();
-  };
-</script>
+    <audio id="beep-sound">
+      <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
+    </audio>
   </div>
 
   <script>
+    /* --------------------- AFFIRMATIONS --------------------- */
     const affirmations = {
       motivation: [
-        "Keep going — you're building momentum.",
-        "Progress beats perfection.",
-        "You are capable of more than you think.",
-        "Action creates confidence."
+        "You are capable of amazing things.",
+        "Your potential is limitless.",
+        "Every day is a fresh start."
       ],
       calm: [
-        "Breathe. You are safe in this moment.",
-        "It's okay to slow down.",
-        "Peace begins with one deep breath.",
-        "You don't need to rush."
+        "Breathe deeply and let go.",
+        "Peace begins within.",
+        "You are relaxed and centered."
       ],
       confidence: [
-        "You bring value just by being you.",
-        "You deserve to take up space.",
-        "Your voice matters.",
-        "You are more ready than you feel."
+        "You are strong and confident.",
+        "You believe in yourself.",
+        "Your confidence inspires others."
       ]
     };
 
     function showAffirmation() {
       const category = document.getElementById("category").value;
-      const selectedList = affirmations[category];
-      const randomIndex = Math.floor(Math.random() * selectedList.length);
-      const randomAffirmation = selectedList[randomIndex];
-
-      document.getElementById("affirmation").innerText = randomAffirmation;
+      const list = affirmations[category];
+      const randomIndex = Math.floor(Math.random() * list.length);
+      const affirmation = list[randomIndex];
+      document.getElementById("affirmation").innerText = affirmation;
     }
 
     function showRandomAffirmation() {
@@ -212,10 +182,127 @@
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
       const list = affirmations[randomCategory];
       const randomIndex = Math.floor(Math.random() * list.length);
-      const randomAffirmation = list[randomIndex];
-
-      document.getElementById("affirmation").innerText = randomAffirmation;
+      const affirmation = list[randomIndex];
+      document.getElementById("affirmation").innerText = affirmation;
     }
+
+    // Daily affirmation with localStorage
+    function getTodayString() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+
+    function showDailyAffirmation() {
+      const todayKey = "dailyAffirmationDate";
+      const storedDate = localStorage.getItem(todayKey);
+      const storedAffirmation = localStorage.getItem("dailyAffirmationText");
+      const today = getTodayString();
+
+      if (storedDate === today && storedAffirmation) {
+        document.getElementById("affirmation").innerText = storedAffirmation;
+      } else {
+        const categories = Object.keys(affirmations);
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const list = affirmations[randomCategory];
+        const randomIndex = Math.floor(Math.random() * list.length);
+        const randomAffirmation = list[randomIndex];
+
+        document.getElementById("affirmation").innerText = randomAffirmation;
+        localStorage.setItem(todayKey, today);
+        localStorage.setItem("dailyAffirmationText", randomAffirmation);
+      }
+    }
+
+    // Favorites
+    function loadFavorites() {
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      const listEl = document.getElementById("favoritesList");
+      listEl.innerHTML = "";
+      favorites.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        listEl.appendChild(li);
+      });
+    }
+
+    function saveFavorite() {
+      const current = document.getElementById("affirmation").innerText;
+      if (!current) return;
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      if (!favorites.includes(current)) {
+        favorites.push(current);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        loadFavorites();
+      }
+    }
+
+    window.onload = function() {
+      showDailyAffirmation();
+      loadFavorites();
+    };
+
+    /* --------------------- BREATH TIMER --------------------- */
+    const phases = [
+      { name: "Inhale", duration: 4 },
+      { name: "Hold", duration: 7 },
+      { name: "Exhale", duration: 8 },
+      { name: "Hold", duration: 7 },
+    ];
+
+    let currentPhase = 0;
+    let remainingTime = 0;
+    let timerInterval = null;
+
+    const phaseNameEl = document.getElementById("phase-name");
+    const phaseCountdownEl = document.getElementById("phase-countdown");
+    const beepSound = document.getElementById("beep-sound");
+    const breathCircle = document.getElementById("breath-circle");
+
+    function updateCircle() {
+      if (!breathCircle) return;
+      if (phases[currentPhase].name === "Inhale") {
+        breathCircle.style.transform = "scale(1.5)";
+      } else if (phases[currentPhase].name === "Exhale") {
+        breathCircle.style.transform = "scale(0.8)";
+      } else {
+        breathCircle.style.transform = "scale(1)";
+      }
+    }
+
+    function startBreathTimer() {
+      if (timerInterval) return;
+      currentPhase = 0;
+      remainingTime = phases[currentPhase].duration;
+      phaseNameEl.innerText = phases[currentPhase].name;
+      phaseCountdownEl.innerText = remainingTime;
+      beepSound.play();
+      updateCircle();
+
+      timerInterval = setInterval(() => {
+        remainingTime--;
+        phaseCountdownEl.innerText = remainingTime;
+
+        if (remainingTime <= 0) {
+          currentPhase = (currentPhase + 1) % phases.length;
+          remainingTime = phases[currentPhase].duration;
+          phaseNameEl.innerText = phases[currentPhase].name;
+          phaseCountdownEl.innerText = remainingTime;
+          beepSound.play();
+        }
+        updateCircle();
+      }, 1000);
+    }
+
+    function stopBreathTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      phaseNameEl.innerText = "Press Start";
+      phaseCountdownEl.innerText = 0;
+      breathCircle.style.transform = "scale(1)";
+    }
+
+    document.getElementById("start-timer").addEventListener("click", startBreathTimer);
+    document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
   </script>
 </body>
 </html>
