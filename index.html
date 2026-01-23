@@ -6,18 +6,24 @@
   <title>Affirmation Generator & Breath Timer</title>
   <style>
     /* BODY & CONTAINER */
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #1a1a1a, #1f4040);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      margin: 0;
-      color: #e0e0e0;
-      padding: 20px;
-    }
+   body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #1a1a1a, #1f4040);
+  min-height: 100vh;
+  height: 100vh;          /* fill viewport exactly */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  color: #e0e0e0;
+  padding: 0;             /* remove extra padding causing scroll */
+  overflow: hidden;       /* prevent any scroll */
+}
+
+.container:first-of-type {
+  margin-top: 3vh; /* 3% of viewport height */
+}
 
     .container {
       background: #2c2c2c;
@@ -229,35 +235,58 @@
     loadFavorites();
 
     /* --------------------- BREATH TIMER --------------------- */
-    const breathPresets = {
-      "Box (4-4-4-4)": [
-        { name:"Inhale", duration:4 },
-        { name:"Hold", duration:4 },
-        { name:"Exhale", duration:4 },
-        { name:"Hold", duration:4 }
-      ],
-      "Calming (4-7-8-7)": [
-        { name:"Inhale", duration:4 },
-        { name:"Hold", duration:7 },
-        { name:"Exhale", duration:8 },
-        { name:"Hold", duration:7 }
-      ]
-    };
+    /* --------------------- BREATH TIMER PRESETS --------------------- */
+const breathPresets = {
+  "Box (4-4-4-4)": [
+    { name: "Inhale", duration: 4 },
+    { name: "Hold", duration: 4 },
+    { name: "Exhale", duration: 4 },
+    { name: "Hold", duration: 4 }
+  ],
+  "Calming (4-7-8-7)": [
+    { name: "Inhale", duration: 4 },
+    { name: "Hold", duration: 7 },
+    { name: "Exhale", duration: 8 },
+    { name: "Hold", duration: 7 }
+  ],
+  "Paced Belly Breathing (3-6-6-3)": [
+    { name: "Inhale", duration: 3 },
+    { name: "Hold", duration: 3 },
+    { name: "Exhale", duration: 6 },
+    { name: "Hold", duration: 3 }
+  ],
+  "Deep Breathing w/ Arm Raises (4-4)": [
+    { name: "Inhale & Raise Arms", duration: 4 },
+    { name: "Exhale & Lower Arms", duration: 4 }
+  ]
+};
 
-    const presetPhasesText = {
-      "Box (4-4-4-4)": [
-        "Inhale slowly through your nose for 4 counts.",
-        "Hold your breath for 4 counts.",
-        "Exhale slowly through your mouth for 4 counts.",
-        "Hold your breath again for 4 counts."
-      ],
-      "Calming (4-7-8-7)": [
-        "Inhale quietly through your nose for 4 seconds.",
-        "Hold your breath for 7 seconds.",
-        "Exhale forcefully through your mouth for 8 seconds.",
-        "Hold your breath again for 7 seconds."
-      ]
-    };
+/* --------------------- PHASE-SPECIFIC INSTRUCTIONS --------------------- */
+const presetPhasesText = {
+  "Box (4-4-4-4)": [
+    "Inhale slowly through your nose for 4 counts.",
+    "Hold your breath for 4 counts.",
+    "Exhale slowly through your mouth for 4 counts.",
+    "Hold your breath again for 4 counts."
+  ],
+  "Calming (4-7-8-7)": [
+    "Inhale quietly through your nose for 4 seconds.",
+    "Hold your breath for 7 seconds.",
+    "Exhale forcefully through your mouth for 8 seconds.",
+    "Hold your breath again for 7 seconds."
+  ],
+  "Paced Belly Breathing (3-6-6-3)": [
+    "Inhale deeply through your nose for 3 counts, feeling your belly expand.",
+    "Hold your breath for 3 counts.",
+    "Exhale slowly through pursed lips for 6 counts, letting your belly fall.",
+    "Hold your breath for 3 counts."
+  ],
+  "Deep Breathing w/ Arm Raises (4-4)": [
+    "Inhale while slowly raising your arms overhead for 4 counts.",
+    "Exhale while lowering your arms slowly for 4 counts."
+  ]
+};
+
 
     const phaseNameEl = document.getElementById("phase-name");
     const phaseCountdownEl = document.getElementById("phase-countdown");
