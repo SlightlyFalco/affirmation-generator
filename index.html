@@ -61,24 +61,79 @@
     background: #7b66e0; /* slightly lighter purple */
     transform: translateY(-2px);
   }
+  
 </style>
+<script>
+  // Load favorites from localStorage and display them
+  function loadFavorites() {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const listEl = document.getElementById("favoritesList");
+    listEl.innerHTML = ""; // Clear previous list
 
+    favorites.forEach((text, index) => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      listEl.appendChild(li);
+    });
+  }
+
+  // Save the currently displayed affirmation as a favorite
+  function saveFavorite() {
+    const current = document.getElementById("affirmation").innerText;
+    if (!current) return; // Nothing to save
+
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    // Avoid duplicates
+    if (!favorites.includes(current)) {
+      favorites.push(current);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      loadFavorites();
+    }
+  }
+
+  // Load favorites on page load
+  window.onload = function() {
+    showDailyAffirmation(); // existing daily feature
+    loadFavorites();         // new favorites feature
+  };
+</script>
 
 
 </head>
 <body>
-  <div class="container">
-    <h1>Affirmation Generator</h1>
-    <p id="affirmation"></p>
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+  <h1>Affirmation Generator</h1>
 
-    <select id="category">
-      <option value="motivation">Motivation</option>
-      <option value="calm">Calm</option>
-      <option value="confidence">Confidence</option>
-    </select>
+  <!-- Daily Affirmation / main text -->
+  <p id="affirmation"></p>
 
+  <!-- Category dropdown -->
+  <select id="category">
+    <option value="motivation">Motivation</option>
+    <option value="calm">Calm</option>
+    <option value="confidence">Confidence</option>
+  </select>
+
+  <!-- Buttons: Get, Surprise Me, Save Favorite -->
+  <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
     <button onclick="showAffirmation()">Get Affirmation</button>
     <button onclick="showRandomAffirmation()">Surprise Me!</button>
+    <button onclick="saveFavorite()">Save to Favorites ❤️</button>
+  </div>
+
+  <!-- Favorites list -->
+  <div style="text-align: center; margin-top: 16px; width: 100%;">
+    <h3>Your Favorites:</h3>
+    <ul id="favoritesList" style="list-style: none; padding-left: 0;"></ul>
+  </div>
+</div>
+
+
+
+</div>
+
+
     <script>
   // Helper: get a string of today’s date
   function getTodayString() {
