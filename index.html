@@ -103,6 +103,19 @@
       height: 120px;
       box-sizing: border-box;
     }
+
+    /* Phase-specific instructions box */
+    #phase-instructions {
+      font-size: 1.2rem;
+      color: #c0c0c0;
+      min-height: 60px;
+      margin-top: 10px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s;
+      width: 100%;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -110,21 +123,17 @@
   <!-- AFFIRMATION GENERATOR -->
   <div class="container">
     <h1>Affirmation Generator</h1>
-
     <p id="affirmation"></p>
-
     <select id="category">
       <option value="motivation">Motivation</option>
       <option value="calm">Calm</option>
       <option value="confidence">Confidence</option>
     </select>
-
     <div class="button-row">
       <button onclick="showAffirmation()">Get Affirmation</button>
       <button onclick="showRandomAffirmation()">Surprise Me!</button>
       <button onclick="saveFavorite()">Save to Favorites ❤️</button>
     </div>
-
     <div style="text-align: center; margin-top: 16px; width: 100%;">
       <h3>Your Favorites:</h3>
       <ul id="favoritesList"></ul>
@@ -133,7 +142,6 @@
 
   <!-- BREATH TIMER -->
   <div class="container" id="breath-timer-container">
-
     <h2>Breath Timer</h2>
 
     <!-- Preset Selector -->
@@ -143,17 +151,11 @@
       <option value="Calming (4-7-8-7)">Calming (4-7-8-7)</option>
     </select>
 
-    <!-- Breathing Exercise Info -->
-    <p id="preset-info" style="margin-top: 8px; font-size: 0.9rem; color: #c0c0c0; min-height: 80px; text-align: left;">
-      Select a preset to see instructions.
-    </p>
-    <!-- PHASE INSTRUCTIONS CONTAINER -->
-<div id="phase-instructions" style="font-size: 1.2rem; color:#c0c0c0; min-height: 60px; margin-top:10px; text-align:center; opacity:0; transition: opacity 0.5s;"></div>
-
+    <!-- Phase-specific instructions -->
+    <div id="phase-instructions"></div>
 
     <p id="phase-name">Press Start</p>
     <p id="phase-countdown">0</p>
-    <div style="height: 20px;"></div>
 
     <div id="breath-circle"></div>
 
@@ -169,84 +171,64 @@
 
   <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  // --------------------- AFFIRMATIONS ---------------------
+  /* --------------------- AFFIRMATIONS --------------------- */
   const affirmations = {
-    motivation: [
-      "You are capable of amazing things.",
-      "Your potential is limitless.",
-      "Every day is a fresh start."
-    ],
-    calm: [
-      "Breathe deeply and let go.",
-      "Peace begins within.",
-      "You are relaxed and centered."
-    ],
-    confidence: [
-      "You are strong and confident.",
-      "You believe in yourself.",
-      "Your confidence inspires others."
-    ]
+    motivation: ["You are capable of amazing things.","Your potential is limitless.","Every day is a fresh start."],
+    calm: ["Breathe deeply and let go.","Peace begins within.","You are relaxed and centered."],
+    confidence: ["You are strong and confident.","You believe in yourself.","Your confidence inspires others."]
   };
 
   function showAffirmation() {
-    const category = document.getElementById("category").value;
-    const list = affirmations[category];
-    const randomIndex = Math.floor(Math.random() * list.length);
-    document.getElementById("affirmation").innerText = list[randomIndex];
+    const cat = document.getElementById("category").value;
+    const list = affirmations[cat];
+    document.getElementById("affirmation").innerText = list[Math.floor(Math.random()*list.length)];
   }
 
   function showRandomAffirmation() {
     const categories = Object.keys(affirmations);
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const list = affirmations[randomCategory];
-    const randomIndex = Math.floor(Math.random() * list.length);
-    document.getElementById("affirmation").innerText = list[randomIndex];
+    const cat = categories[Math.floor(Math.random()*categories.length)];
+    const list = affirmations[cat];
+    document.getElementById("affirmation").innerText = list[Math.floor(Math.random()*list.length)];
   }
 
-  function getTodayString() {
-    return new Date().toISOString().split('T')[0];
-  }
+  function getTodayString() { return new Date().toISOString().split('T')[0]; }
 
   function showDailyAffirmation() {
-    const todayKey = "dailyAffirmationDate";
+    const todayKey="dailyAffirmationDate";
     const storedDate = localStorage.getItem(todayKey);
     const storedAffirmation = localStorage.getItem("dailyAffirmationText");
-    const today = getTodayString();
-
-    if (storedDate === today && storedAffirmation) {
-      document.getElementById("affirmation").innerText = storedAffirmation;
+    const today=getTodayString();
+    if(storedDate===today && storedAffirmation){
+      document.getElementById("affirmation").innerText=storedAffirmation;
     } else {
-      const categories = Object.keys(affirmations);
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      const list = affirmations[randomCategory];
-      const randomIndex = Math.floor(Math.random() * list.length);
-      const randomAffirmation = list[randomIndex];
-
-      document.getElementById("affirmation").innerText = randomAffirmation;
-      localStorage.setItem(todayKey, today);
-      localStorage.setItem("dailyAffirmationText", randomAffirmation);
+      const categories=Object.keys(affirmations);
+      const cat=categories[Math.floor(Math.random()*categories.length)];
+      const list=affirmations[cat];
+      const aff=list[Math.floor(Math.random()*list.length)];
+      document.getElementById("affirmation").innerText=aff;
+      localStorage.setItem(todayKey,today);
+      localStorage.setItem("dailyAffirmationText",aff);
     }
   }
 
   function loadFavorites() {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    const listEl = document.getElementById("favoritesList");
-    listEl.innerHTML = "";
-    favorites.forEach(text => {
-      const li = document.createElement("li");
-      li.textContent = text;
+    const favorites=JSON.parse(localStorage.getItem("favorites"))||[];
+    const listEl=document.getElementById("favoritesList");
+    listEl.innerHTML="";
+    favorites.forEach(t=>{
+      const li=document.createElement("li");
+      li.textContent=t;
       listEl.appendChild(li);
     });
   }
 
   function saveFavorite() {
-    const current = document.getElementById("affirmation").innerText;
-    if (!current) return;
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (!favorites.includes(current)) {
+    const current=document.getElementById("affirmation").innerText;
+    if(!current)return;
+    let favorites=JSON.parse(localStorage.getItem("favorites"))||[];
+    if(!favorites.includes(current)){
       favorites.push(current);
-      localStorage.setItem("favorites", JSON.stringify(favorites));
+      localStorage.setItem("favorites",JSON.stringify(favorites));
       loadFavorites();
     }
   }
@@ -254,150 +236,82 @@ document.addEventListener("DOMContentLoaded", () => {
   showDailyAffirmation();
   loadFavorites();
 
-  // --------------------- BREATH TIMER ---------------------
-  const breathPresets = {
-    "Box (4-4-4-4)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 4 },
-      { name: "Exhale", duration: 4 },
-      { name: "Hold", duration: 4 },
-    ],
-    "Calming (4-7-8-7)": [
-      { name: "Inhale", duration: 4 },
-      { name: "Hold", duration: 7 },
-      { name: "Exhale", duration: 8 },
-      { name: "Hold", duration: 7 },
-    ]
+  /* --------------------- BREATH TIMER --------------------- */
+  const breathPresets={
+    "Box (4-4-4-4)":[{name:"Inhale",duration:4},{name:"Hold",duration:4},{name:"Exhale",duration:4},{name:"Hold",duration:4}],
+    "Calming (4-7-8-7)":[{name:"Inhale",duration:4},{name:"Hold",duration:7},{name:"Exhale",duration:8},{name:"Hold",duration:7}]
+  };
+  const presetPhasesText={
+    "Box (4-4-4-4)":["Inhale slowly through your nose for 4 counts.","Hold your breath for 4 counts.","Exhale slowly through your mouth for 4 counts.","Hold your breath again for 4 counts."],
+    "Calming (4-7-8-7)":["Inhale quietly through your nose for 4 seconds.","Hold your breath for 7 seconds.","Exhale forcefully through your mouth for 8 seconds.","Hold your breath again for 7 seconds."]
   };
 
-  const presetPhasesText = {
-    "Box (4-4-4-4)": [
-      "Inhale slowly through your nose for 4 counts.",
-      "Hold your breath for 4 counts.",
-      "Exhale slowly through your mouth for 4 counts.",
-      "Hold your breath again for 4 counts."
-    ],
-    "Calming (4-7-8-7)": [
-      "Inhale quietly through your nose for 4 seconds.",
-      "Hold your breath for 7 seconds.",
-      "Exhale forcefully through your mouth for 8 seconds.",
-      "Hold your breath again for 7 seconds."
-    ]
-  };
+  let phases=[...breathPresets["Box (4-4-4-4)"]];
+  let currentPhase=0;
+  let remainingTime=0;
+  let timerInterval=null;
 
-  const presetInfo = {
-    "Box (4-4-4-4)": `Box Breathing (Square Breathing):
-Inhale slowly through your nose for 4 counts.
-Hold your breath for 4 counts.
-Exhale slowly through your mouth for 4 counts.
-Hold your breath again for 4 counts.
-Repeat as needed.`,
-    "Calming (4-7-8-7)": `4-7-8 Breathing (Relaxing Breath):
-Inhale quietly through your nose for 4 seconds.
-Hold your breath for 7 seconds.
-Exhale forcefully through your mouth for 8 seconds.
-Repeat the cycle up to 4 times.`
-  };
+  const phaseNameEl=document.getElementById("phase-name");
+  const phaseCountdownEl=document.getElementById("phase-countdown");
+  const beepSound=document.getElementById("beep-sound");
+  const breathCircle=document.getElementById("breath-circle");
+  const presetSelect=document.getElementById("presetSelect");
+  const instructionsEl=document.getElementById("phase-instructions");
 
-  let phases = [...breathPresets["Box (4-4-4-4)"]];
-  let currentPhase = 0;
-  let remainingTime = 0;
-  let timerInterval = null;
-
-  const phaseNameEl = document.getElementById("phase-name");
-  const phaseCountdownEl = document.getElementById("phase-countdown");
-  const instructionsEl = document.getElementById("phase-instructions");
-  const beepSound = document.getElementById("beep-sound");
-  const breathCircle = document.getElementById("breath-circle");
-  const presetSelect = document.getElementById("presetSelect");
-  const presetInfoEl = document.getElementById("preset-info");
-
-  function updateCircle() {
-    const phase = phases[currentPhase];
-    if (phase.name === "Inhale") {
-      breathCircle.style.transition = `transform ${phase.duration}s linear`;
-      breathCircle.style.transform = "scale(1.5)";
-    } else if (phase.name === "Exhale") {
-      breathCircle.style.transition = `transform ${phase.duration}s linear`;
-      breathCircle.style.transform = "scale(0.7)";
-    } else {
-      breathCircle.style.transition = "none";
-      if (phases[currentPhase - 1]?.name === "Inhale") {
-        breathCircle.style.transform = "scale(1.5)";
-      } else if (phases[currentPhase - 1]?.name === "Exhale") {
-        breathCircle.style.transform = "scale(0.7)";
-      }
-    }
+  function updateCircle(){
+    const phase=phases[currentPhase];
+    if(phase.name==="Inhale"){breathCircle.style.transition=`transform ${phase.duration}s linear`; breathCircle.style.transform="scale(1.5)";}
+    else if(phase.name==="Exhale"){breathCircle.style.transition=`transform ${phase.duration}s linear`; breathCircle.style.transform="scale(0.7)";}
+    else{breathCircle.style.transition="none"; if(phases[currentPhase-1]?.name==="Inhale") breathCircle.style.transform="scale(1.5)"; else if(phases[currentPhase-1]?.name==="Exhale") breathCircle.style.transform="scale(0.7)";}
   }
 
-  function startBreathTimer() {
-    if (timerInterval) return;
+  function updateInstructions(){ 
+    const selected=presetSelect.value;
+    const text=presetPhasesText[selected][currentPhase]||"";
+    instructionsEl.style.opacity=0;
+    setTimeout(()=>{instructionsEl.innerText=text; instructionsEl.style.opacity=1;},200);
+  }
 
-    const selectedPreset = presetSelect.value;
-    presetInfoEl.innerText = presetInfo[selectedPreset] || "";
-    phases = breathPresets[selectedPreset].map(p => ({ ...p }));
-
-    currentPhase = 0;
-    remainingTime = phases[currentPhase].duration;
-    phaseNameEl.innerText = phases[currentPhase].name;
-    phaseCountdownEl.innerText = remainingTime;
-
-    // Show first instruction
-    instructionsEl.innerText = presetPhasesText[selectedPreset][currentPhase];
-    instructionsEl.style.opacity = 1;
-
-    // Play beep at start
-    if (beepSound) {
-      beepSound.currentTime = 0;
-      beepSound.play().catch(() => {});
-    }
-
+  function startBreathTimer(){
+    if(timerInterval)return;
+    const selected=presetSelect.value;
+    phases=breathPresets[selected].map(p=>({...p}));
+    currentPhase=0;
+    remainingTime=phases[currentPhase].duration;
+    phaseNameEl.innerText=phases[currentPhase].name;
+    phaseCountdownEl.innerText=remainingTime;
+    updateInstructions();
     updateCircle();
+    if(beepSound){beepSound.currentTime=0; beepSound.play().catch(()=>{});}
 
-    timerInterval = setInterval(() => {
+    timerInterval=setInterval(()=>{
       remainingTime--;
-      phaseCountdownEl.innerText = remainingTime;
-
-      if (remainingTime <= 0) {
-        currentPhase = (currentPhase + 1) % phases.length;
-        remainingTime = phases[currentPhase].duration;
-        phaseNameEl.innerText = phases[currentPhase].name;
-        phaseCountdownEl.innerText = remainingTime;
-
-        if (beepSound) {
-          beepSound.currentTime = 0;
-          beepSound.play().catch(() => {});
-        }
-
-        // Update instructions with fade
-        const selectedPreset = presetSelect.value;
-        const phaseTextLines = presetPhasesText[selectedPreset] || [""];
-        instructionsEl.style.opacity = 0;
-        setTimeout(() => {
-          instructionsEl.innerText = phaseTextLines[currentPhase];
-          instructionsEl.style.opacity = 1;
-        }, 200);
-
+      phaseCountdownEl.innerText=remainingTime;
+      if(remainingTime<=0){
+        currentPhase=(currentPhase+1)%phases.length;
+        remainingTime=phases[currentPhase].duration;
+        phaseNameEl.innerText=phases[currentPhase].name;
+        phaseCountdownEl.innerText=remainingTime;
+        if(beepSound){beepSound.currentTime=0; beepSound.play().catch(()=>{});}
+        updateInstructions();
       }
-
       updateCircle();
-    }, 1000);
+    },1000);
   }
 
-  function stopBreathTimer() {
+  function stopBreathTimer(){
     clearInterval(timerInterval);
-    timerInterval = null;
-    phaseNameEl.innerText = "Press Start";
-    phaseCountdownEl.innerText = 0;
-    instructionsEl.style.opacity = 0;
-    breathCircle.style.transform = "scale(1)";
+    timerInterval=null;
+    phaseNameEl.innerText="Press Start";
+    phaseCountdownEl.innerText=0;
+    breathCircle.style.transform="scale(1)";
+    instructionsEl.style.opacity=0;
   }
 
-  document.getElementById("start-timer").addEventListener("click", startBreathTimer);
-  document.getElementById("stop-timer").addEventListener("click", stopBreathTimer);
+  document.getElementById("start-timer").addEventListener("click",startBreathTimer);
+  document.getElementById("stop-timer").addEventListener("click",stopBreathTimer);
 
-}); // CLEANED SCRIPT END
-</script>
-
+});
+  </script>
 </body>
 </html>
