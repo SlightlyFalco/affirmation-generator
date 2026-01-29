@@ -217,7 +217,7 @@
       <button id="start-timer">Start</button>
       <button id="stop-timer">Stop</button>
     </div>
-    <audio id="beep-sound">
+    <audio id="beep-sound" preload="auto">
       <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
     </audio>
   </div>
@@ -472,6 +472,86 @@ const breathCircle = document.getElementById("breath-circle");
 let phases = [...breathPresets[presetSelect.value]];
 let currentPhase = 0, remainingTime = 0, timerInterval = null;
 
+// Audio: prefer <audio>, but reliably fallback to Web Audio in Chrome.
+let audioCtx = null;
+function getAudioContext() {
+  if (audioCtx) return audioCtx;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  audioCtx = new Ctx();
+  return audioCtx;
+}
+
+function webAudioBeep() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    // Resume best-effort; safe to ignore failures here.
+    ctx.resume().catch(() => {});
+  }
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  // Subtle, short cue (mindfulness-friendly).
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(880, now);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.13);
+  osc.onended = () => {
+    try { osc.disconnect(); } catch (_) {}
+    try { gain.disconnect(); } catch (_) {}
+  };
+}
+
+function primeAudio() {
+  // Called from the Start button click (user gesture) to maximize success in Chrome.
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
+  if (beepSound) {
+    try { beepSound.load(); } catch (_) {}
+    try { beepSound.volume = 0.7; } catch (_) {}
+  }
+}
+
+function playBeep() {
+  if (!beepSound) {
+    webAudioBeep();
+    return;
+  }
+
+  try {
+    // If media isn't ready yet, kick off loading and use Web Audio fallback.
+    if (beepSound.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      try { beepSound.load(); } catch (_) {}
+      webAudioBeep();
+      return;
+    }
+
+    // Reset to start for consistent phase-change cues.
+    try { beepSound.currentTime = 0; } catch (_) {}
+
+    const p = beepSound.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        // Common in Chrome if playback is blocked or the resource fails.
+        webAudioBeep();
+      });
+    }
+  } catch (_) {
+    webAudioBeep();
+  }
+}
+
 function updateCircle() {
   const phase = phases[currentPhase];
 
@@ -540,6 +620,7 @@ phaseCountdownEl.style.color = "#FF6B6B";
 
 function startBreathTimer() {
   if (timerInterval) return;
+  primeAudio();
   const selected = presetSelect.value;
   phases = breathPresets[selected].map(p => ({ ...p }));
   currentPhase = 0; remainingTime = phases[0].duration;
@@ -547,7 +628,7 @@ function startBreathTimer() {
   phaseCountdownEl.innerText = remainingTime;
   instructionsEl.style.opacity = 0;
   setTimeout(() => { instructionsEl.innerText = presetPhasesText[selected][0]; instructionsEl.style.opacity = 1; }, 100);
-  if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(() => {}); }
+  playBeep();
   updateCircle();
 
   timerInterval = setInterval(() => {
@@ -558,7 +639,7 @@ function startBreathTimer() {
       remainingTime = phases[currentPhase].duration;
       phaseNameEl.innerText = phases[currentPhase].name;
       phaseCountdownEl.innerText = remainingTime;
-      if (beepSound) { beepSound.currentTime = 0; beepSound.play().catch(() => {}); }
+      playBeep();
       instructionsEl.style.opacity = 0;
       setTimeout(() => { instructionsEl.innerText = presetPhasesText[selected][currentPhase]; instructionsEl.style.opacity = 1; }, 200);
     }
